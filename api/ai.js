@@ -4,9 +4,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ reply: "Only POST allowed" });
   }
 
-  const { prompt } = req.body;
-
   try {
+    const { prompt } = req.body;
+
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -16,25 +16,29 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "llama3-8b-8192",
         messages: [
-          {
-            role: "system",
-            content: "You are a spam detection AI. Tell if message is spam or safe in short."
-          },
-          {
-            role: "user",
-            content: prompt
-          }
+          { role: "system", content: "Detect if message is spam or safe. Give short answer." },
+          { role: "user", content: prompt }
         ]
       })
     });
 
     const data = await response.json();
 
-    res.status(200).json({
-      reply: data.choices?.[0]?.message?.content || "No response"
+    console.log(data); // DEBUG
+
+    if (!data || !data.choices) {
+      return res.status(200).json({
+        reply: "⚠️ API issue: No valid response"
+      });
+    }
+
+    return res.status(200).json({
+      reply: data.choices[0].message.content
     });
 
-  } catch (error) {
-    res.status(500).json({ reply: "Server error" });
+  } catch (err) {
+    return res.status(500).json({
+      reply: "❌ Server error"
+    });
   }
 }
