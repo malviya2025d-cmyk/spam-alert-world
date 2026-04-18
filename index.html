@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+
+<title>Spam Message Checker | Detect Scam SMS & Calls Worldwide</title>
+
+<meta name="description" content="Free spam message checker tool. Detect scam SMS, phishing, fake calls instantly using AI. Stay safe from fraud worldwide.">
+
+<meta name="keywords" content="spam message checker, scam detector, phishing checker, fake sms detection, fraud alert, scam call warning, online safety tool">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SEO Boost -->
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://your-domain.vercel.app/">
+
+<style>
+body { font-family: Arial; text-align: center; background:#f4f4f4; }
+h1 { color:#111; }
+textarea { width:90%; height:120px; padding:10px; }
+button { padding:10px 20px; background:red; color:white; border:none; }
+.result { margin-top:20px; font-size:18px; font-weight:bold; }
+.box { background:white; padding:20px; margin:20px; border-radius:10px; }
+</style>
+
+</head>
+
+<body>
+
+<h1>🌍 Spam Message Checker</h1>
+<p>Check scam SMS, phishing messages, and fraud calls instantly</p>
+
+<div class="box">
+<textarea id="msg" placeholder="Paste message here..."></textarea><br><br>
+<button onclick="checkAI()">Check Now</button>
+<div class="result" id="result"></div>
+</div>
+
+<div class="box">
+<h2>⚠️ Common Scam Examples</h2>
+<p>You won money click here ❌</p>
+<p>Urgent bank update required ❌</p>
+<p>Share OTP now ❌</p>
+</div>
+
+<div class="box">
+<h2>🛡️ How to Stay Safe</h2>
+<p>Never share OTP</p>
+<p>Don't click unknown links</p>
+<p>Verify before trusting</p>
+</div>
+
+<script>
+async function checkAI(){
+  let msg = document.getElementById("msg").value;
+
+  let res = await fetch("/api/ai", {
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body: JSON.stringify({prompt: msg})
+  });
+
+  let data = await res.json();
+  document.getElementById("result").innerText = data.reply;
+}
+</script>
+
+</body>
+</html>
