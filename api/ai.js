@@ -14,9 +14,9 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama3-70b-8192",   // 🔥 UPDATED MODEL
+        model: "llama3-70b-8192",
         messages: [
-          { role: "system", content: "Reply only: Spam or Safe. No explanation." },
+          { role: "system", content: "Reply only Spam or Safe." },
           { role: "user", content: prompt }
         ]
       })
@@ -24,23 +24,20 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // 🔍 FULL DEBUG
-    console.log("FULL API RESPONSE:", JSON.stringify(data, null, 2));
-
-    if (!data || !data.choices || !data.choices[0]) {
+    // 👇 IMPORTANT: real error show karega
+    if (data.error) {
       return res.status(200).json({
-        reply: "❌ API failed - check logs"
+        reply: "❌ " + data.error.message
       });
     }
 
     return res.status(200).json({
-      reply: data.choices[0].message.content
+      reply: data.choices?.[0]?.message?.content || "❌ No AI reply"
     });
 
-  } catch (error) {
-    console.log("ERROR:", error);
+  } catch (err) {
     return res.status(500).json({
-      reply: "❌ Server error"
+      reply: "❌ Server crash"
     });
   }
 }
