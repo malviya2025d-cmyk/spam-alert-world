@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       body: JSON.stringify({
         model: "llama3-8b-8192",
         messages: [
-          { role: "system", content: "Detect if message is spam or safe. Give short answer." },
+          { role: "system", content: "Tell if message is spam or safe. Reply short." },
           { role: "user", content: prompt }
         ]
       })
@@ -24,11 +24,9 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    console.log(data); // DEBUG
-
     if (!data || !data.choices) {
       return res.status(200).json({
-        reply: "⚠️ API issue: No valid response"
+        reply: "⚠️ API problem"
       });
     }
 
@@ -36,7 +34,7 @@ export default async function handler(req, res) {
       reply: data.choices[0].message.content
     });
 
-  } catch (err) {
+  } catch (error) {
     return res.status(500).json({
       reply: "❌ Server error"
     });
