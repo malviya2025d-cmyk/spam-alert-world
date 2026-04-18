@@ -1,43 +1,64 @@
 export default async function handler(req, res) {
 
-  if (req.method !== "POST") {
-    return res.status(405).json({ reply: "Only POST allowed" });
+if (req.method !== "POST") {
+  return res.status(405).json({ reply: "Only POST allowed" });
+}
+
+try {
+
+  const { prompt } = req.body;
+
+  if (!prompt) {
+    return res.status(400).json({ reply: "No prompt provided" });
   }
 
-  try {
-    const { prompt } = req.body;
+  const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: "llama-3.1-8b-instant",  // ✅ correct model
+      messages: [
+        {
+          role: "system",
+          content: "Reply short, clean, no symbols like ### or ---"
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ]
+    })
+  });
 
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "gemma2-9b-it",   // ✅ NEW WORKING MODEL (IMPORTANT)
-        messages: [
-          { role: "user", content: `Check this message and reply only Spam or Safe: ${prompt}` }
-        ]
-      })
-    });
+  const data = await response.json();
 
-    const data = await response.json();
+  console.log("API RESPONSE:", data);
 
-    console.log("API DATA:", data);
-
-    if (data.error) {
-      return res.status(200).json({
-        reply: "❌ " + data.error.message
-      });
-    }
-
-    return res.status(200).json({
-      reply: data.choices?.[0]?.message?.content || "❌ No AI reply"
-    });
-
-  } catch (err) {
+  if (!response.ok) {
     return res.status(500).json({
-      reply: "❌ Server error"
+      reply: "❌ API Error",
+      error: data
     });
   }
+
+  const reply = data?.choices?.[0]?.message?.content;
+
+  if (!reply) {
+    return res.status(500).json({
+      reply: "❌ No reply from AI",
+      full: data
+    });
+  }
+
+  return res.status(200).json({ reply });
+
+} catch (error) {
+  return res.status(500).json({
+    reply: "❌ Server Error",
+    error: error.message
+  });
+}
 }
