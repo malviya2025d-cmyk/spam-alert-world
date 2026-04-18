@@ -14,17 +14,17 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "mixtral-8x7b-32768",   // ✅ FINAL WORKING MODEL
+        model: "gemma2-9b-it",   // ✅ NEW WORKING MODEL (IMPORTANT)
         messages: [
-          { role: "system", content: "Reply only Spam or Safe." },
-          { role: "user", content: prompt }
+          { role: "user", content: `Check this message and reply only Spam or Safe: ${prompt}` }
         ]
       })
     });
 
     const data = await response.json();
 
-    // error handle
+    console.log("API DATA:", data);
+
     if (data.error) {
       return res.status(200).json({
         reply: "❌ " + data.error.message
