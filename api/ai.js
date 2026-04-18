@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192",   // ✅ WORKING MODEL
+        model: "mixtral-8x7b-32768",   // ✅ FINAL WORKING MODEL
         messages: [
           { role: "system", content: "Reply only Spam or Safe." },
           { role: "user", content: prompt }
@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // 🔍 Error show karega agar API me problem ho
+    // error handle
     if (data.error) {
       return res.status(200).json({
         reply: "❌ " + data.error.message
